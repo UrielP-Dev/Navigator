@@ -3,9 +3,10 @@ import { Text, View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons } from '@expo/vector-icons';
 import HomeScreen from "./HomeScreen";
+import EmployeeList from "./EmployeeList";
 
 // Screens
-function Home() {
+function AddScreen() {
     return (
         <View style={styles.container}>
             <HomeScreen></HomeScreen>
@@ -14,10 +15,10 @@ function Home() {
     );
 }
 
-function ProfileScreen() {
+function EmployeesScreen() {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Profile Screen</Text>
+           <EmployeeList></EmployeeList>
         </View>
     );
 }
@@ -37,9 +38,9 @@ function InitialScreen() {
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ color, size }) => {
                     let iconName;
-                    if (route.name === 'Home') {
+                    if (route.name === 'Add Employee') {
                         iconName = 'person-add';
-                    } else if (route.name === 'Profile') {
+                    } else if (route.name === 'Employees') {
                         iconName = 'person-search';
                     } else if (route.name === 'Settings') {
                         iconName = 'settings';
@@ -51,8 +52,8 @@ function InitialScreen() {
                 headerShown: false,
             })}
         >
-            <Tab.Screen name="Home" component={Home} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name="Add Employee" component={AddScreen} />
+            <Tab.Screen name="Employees" component={EmployeesScreen} />
             <Tab.Screen name="Settings" component={SettingsScreen} />
         </Tab.Navigator>
     );

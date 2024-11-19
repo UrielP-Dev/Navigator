@@ -1,21 +1,58 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
+import {View, Text, TextInput, Pressable, ScrollView,  ToastAndroid} from 'react-native';
+import { collection, addDoc } from "firebase/firestore";
+import { db } from '../Utils/Firebase';
+import Toast from "./Toast";
+import {Calendar} from 'react-native-calendars';
+
+
+
+interface Day {
+    dateString: string;
+    day: number;
+    month: number;
+    year: number;
+    timestamp?: number;
+
+}
 
 const Forms = () => {
+
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
         position: '',
         department: '',
         phone: '',
-        startDate: '',
-        employeeId: ''
+        startDate: new Date().toISOString().split('T')[0]
     });
 
-    const handleSubmit = () => {
-        // Logic to submit data
-        console.log(formData);
+    const handleDateChange = (day: Day) => {
+        setFormData({ ...formData, startDate: day.dateString  });
     };
+
+    const handleSubmit = async () => {
+        try {
+            const docRef = await addDoc(collection(db, "Employees"), formData);
+            console.log("Employee registered with ID: ", docRef.id);
+            Toast.show('Employee successfully registered!', ToastAndroid.LONG);
+            setFormData({
+                fullName: '',
+                email: '',
+                position: '',
+                department: '',
+                phone: '',
+                startDate: new Date().toISOString().split('T')[0]
+            });
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            Toast.showWithGravity(
+                'Failed to register employee. Please try again.',
+                ToastAndroid.LONG,
+                ToastAndroid.CENTER)
+        }
+    };
+
 
     return (
         <ScrollView className="flex-1 bg-main px-6 py-8 mt-8">
@@ -70,7 +107,6 @@ const Forms = () => {
                     />
                 </View>
 
-                {/* Department */}
                 <View>
                     <Text className="text-black text-base font-bold mb-1">
                         Department
@@ -84,7 +120,6 @@ const Forms = () => {
                     />
                 </View>
 
-                {/* Phone */}
                 <View>
                     <Text className="text-black text-base font-bold mb-1">
                         Phone Number
@@ -99,28 +134,31 @@ const Forms = () => {
                     />
                 </View>
 
-                {/* Start Date */}
                 <View>
                     <Text className="text-black text-base font-bold mb-1">
                         Start Date
                     </Text>
-                    <TextInput
-                        className="w-full bg-secondary/50 border border-secondary rounded-lg px-4 py-3 text-black"
-                        placeholder="MM/DD/YYYY"
-                        placeholderTextColor="#857e8e80"
-                        value={formData.startDate}
-                        onChangeText={(text) => setFormData({...formData, startDate: text})}
+                    <Calendar
+                        onDayPress={(day: Day) => handleDateChange(day)}
+                        markedDates={{
+                            [formData.startDate]: { selected: true, selectedColor: 'blue' },
+                        }}
+                        className='h-3'
                     />
                 </View>
+
                 <Pressable
                     onPress={handleSubmit}
-                    className="w-full bg-Skyblue py-4 rounded-lg mt-16 active:bg-Skyblue/80">
+                    className="w-full bg-Skyblue py-4 rounded-lg mb-16 active:bg-Skyblue/80">
                     <Text className="text-white text-center font-semibold text-lg">
                         Register Employee
                     </Text>
                 </Pressable>
             </View>
+
         </ScrollView>
+
+
     );
 };
 
